@@ -22,7 +22,6 @@ document.addEventListener('DOMContentLoaded', () => {
   const modeToggle = document.getElementById('modeToggle');
   const heartStars = document.querySelector('.heart-stars');
   const body = document.body;
-  let typewriterAbort = null;
 
   const spawnConfetti = () => {
     if (!glitterLayer) return;
@@ -53,50 +52,18 @@ document.addEventListener('DOMContentLoaded', () => {
 
   // Initialize and cache original letter content
   const letterTexts = document.querySelectorAll('.letter-text');
-  letterTexts.forEach(el => {
-    if (!el.dataset.original) {
-      el.dataset.original = el.innerHTML;
-      el.dataset.originalText = el.textContent;
-    }
+  const originalContent = [];
+  letterTexts.forEach((el, idx) => {
+    originalContent[idx] = el.innerHTML;
   });
 
-  const typewriterEffect = async () => {
-    // Cancel any previous typewriter effect
-    if (typewriterAbort) {
-      typewriterAbort.abort();
-    }
-    typewriterAbort = new AbortController();
-    const signal = typewriterAbort.signal;
-
+  const restoreLetterContent = () => {
     const letterTexts = document.querySelectorAll('.letter-text');
-    
-    // First restore all to original state
-    letterTexts.forEach(el => {
-      if (el.dataset.original) {
-        el.innerHTML = el.dataset.original;
+    letterTexts.forEach((el, idx) => {
+      if (originalContent[idx]) {
+        el.innerHTML = originalContent[idx];
       }
     });
-    
-    const texts = Array.from(letterTexts).map(el => el.dataset.originalText || el.textContent);
-    
-    // Clear all textContent first
-    letterTexts.forEach(el => el.textContent = '');
-    
-    // Type each one sequentially
-    try {
-      for (let idx = 0; idx < texts.length; idx += 1) {
-        if (signal.aborted) return;
-        const content = texts[idx];
-        const textEl = letterTexts[idx];
-        for (let i = 0; i < content.length; i += 1) {
-          if (signal.aborted) return;
-          textEl.textContent += content[i];
-          await new Promise(resolve => setTimeout(resolve, 16));
-        }
-      }
-    } catch (e) {
-      // Typewriter was cancelled
-    }
   };
 
   const toggleEnvelope = () => {
@@ -112,7 +79,6 @@ document.addEventListener('DOMContentLoaded', () => {
     }
     if (isOpen) {
       spawnConfetti();
-      typewriterEffect();
       if (heartStars) {
         heartStars.classList.add('is-on');
         setTimeout(() => heartStars.classList.remove('is-on'), 2000);
@@ -121,16 +87,7 @@ document.addEventListener('DOMContentLoaded', () => {
         navigator.vibrate(20);
       }
     } else {
-      // Cancel typewriter if running
-      if (typewriterAbort) {
-        typewriterAbort.abort();
-      }
-      const letterTexts = document.querySelectorAll('.letter-text');
-      for (const textEl of letterTexts) {
-        if (textEl.dataset.original) {
-          textEl.innerHTML = textEl.dataset.original;
-        }
-      }
+      restoreLetterContent();
     }
   };
 
