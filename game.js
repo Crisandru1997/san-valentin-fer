@@ -22,6 +22,58 @@ document.addEventListener('DOMContentLoaded', () => {
   const modeToggle = document.getElementById('modeToggle');
   const heartStars = document.querySelector('.heart-stars');
   const body = document.body;
+
+  const spawnConfetti = () => {
+    if (!glitterLayer) return;
+    const rect = envelope.getBoundingClientRect();
+    const centerX = rect.left + rect.width / 2;
+    const centerY = rect.top + rect.height / 2;
+    const colors = ['#ff5a87', '#ff7aa2', '#ffb1c6', '#ff3c73', '#ff8aa6'];
+    const count = 25 + Math.random() * 15;
+    for (let i = 0; i < count; i += 1) {
+      const piece = document.createElement('span');
+      const angle = (Math.PI * 2 * i) / count;
+      const speed = 8 + Math.random() * 12;
+      const offsetX = Math.cos(angle) * speed * 4;
+      const offsetY = Math.sin(angle) * speed * 4;
+      piece.className = 'confetti-piece';
+      piece.style.width = `${6 + Math.random() * 4}px`;
+      piece.style.height = `${6 + Math.random() * 4}px`;
+      piece.style.left = `${centerX}px`;
+      piece.style.top = `${centerY}px`;
+      piece.style.background = colors[Math.floor(Math.random() * colors.length)];
+      piece.style.setProperty('--tx', `${offsetX}px`);
+      piece.style.setProperty('--ty', `${offsetY}px`);
+      piece.style.animationDelay = `${Math.random() * 0.08}s`;
+      glitterLayer.appendChild(piece);
+      piece.addEventListener('animationend', () => piece.remove());
+    }
+  };
+
+  const typewriterEffect = async () => {
+    const letterTexts = document.querySelectorAll('.letter-text');
+    const texts = Array.from(letterTexts).map(el => {
+      // Save original content if not already saved
+      if (!el.dataset.original) {
+        el.dataset.original = el.innerHTML;
+      }
+      return el.textContent;
+    });
+    
+    // Clear all first
+    letterTexts.forEach(el => el.textContent = '');
+    
+    // Type each one sequentially
+    for (let idx = 0; idx < texts.length; idx += 1) {
+      const content = texts[idx];
+      const textEl = letterTexts[idx];
+      for (let i = 0; i < content.length; i += 1) {
+        textEl.textContent += content[i];
+        await new Promise(resolve => setTimeout(resolve, 16));
+      }
+    }
+  };
+
   const toggleEnvelope = () => {
     if (!envelope) return;
     const isOpen = envelope.classList.toggle('open');
@@ -34,12 +86,21 @@ document.addEventListener('DOMContentLoaded', () => {
       }
     }
     if (isOpen) {
+      spawnConfetti();
+      typewriterEffect();
       if (heartStars) {
         heartStars.classList.add('is-on');
         setTimeout(() => heartStars.classList.remove('is-on'), 2000);
       }
       if (navigator.vibrate) {
         navigator.vibrate(20);
+      }
+    } else {
+      const letterTexts = document.querySelectorAll('.letter-text');
+      for (const textEl of letterTexts) {
+        if (textEl.dataset.original) {
+          textEl.innerHTML = textEl.dataset.original;
+        }
       }
     }
   };
