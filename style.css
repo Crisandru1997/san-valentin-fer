@@ -425,7 +425,7 @@ h1 {
   transform: rotateX(-180deg);
 }
 
-.seal {
+.seal-button {
   position: absolute;
   top: 2px;
   left: 50%;
@@ -441,9 +441,12 @@ h1 {
   box-shadow: 0 10px 22px rgba(255, 93, 128, 0.32);
   z-index: 4;
   transition: transform 420ms ease, box-shadow 420ms ease;
+  border: none;
+  cursor: pointer;
+  padding: 0;
 }
 
-.seal::after {
+.seal-button::after {
   content: '';
   position: absolute;
   inset: 8px;
@@ -452,9 +455,19 @@ h1 {
   opacity: 0.6;
 }
 
-.envelope.open .seal {
+.seal-button__icon {
+  font-size: 20px;
+  line-height: 1;
+}
+
+.envelope.open .seal-button {
   transform: translateX(-50%) scale(0.92);
   box-shadow: 0 6px 16px rgba(255, 93, 128, 0.25);
+}
+
+.seal-button:focus-visible {
+  outline: 2px solid rgba(255, 255, 255, 0.6);
+  outline-offset: 3px;
 }
 
 .letter-card {
