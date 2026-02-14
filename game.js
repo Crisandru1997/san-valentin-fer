@@ -3,8 +3,35 @@ document.addEventListener('DOMContentLoaded', () => {
   const addTap = (el, handler) => {
     if (!el) return;
     let touched = false;
+    let startX = 0;
+    let startY = 0;
+    let moved = false;
+
+    const shouldIgnore = (event) => {
+      const target = event.target;
+      return target && target.closest && target.closest('.letter-card__scroll');
+    };
+
     el.addEventListener('touchstart', (e) => {
       touched = true;
+      moved = false;
+      const touch = e.touches[0];
+      if (touch) {
+        startX = touch.clientX;
+        startY = touch.clientY;
+      }
+    });
+    el.addEventListener('touchmove', (e) => {
+      const touch = e.touches[0];
+      if (!touch) return;
+      const dx = Math.abs(touch.clientX - startX);
+      const dy = Math.abs(touch.clientY - startY);
+      if (dx > 10 || dy > 10) {
+        moved = true;
+      }
+    });
+    el.addEventListener('touchend', (e) => {
+      if (shouldIgnore(e) || moved) return;
       handler(e);
     });
     el.addEventListener('click', (e) => {
@@ -12,6 +39,7 @@ document.addEventListener('DOMContentLoaded', () => {
         touched = false;
         return;
       }
+      if (shouldIgnore(e)) return;
       handler(e);
     });
   };
