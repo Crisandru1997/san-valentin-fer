@@ -22,6 +22,7 @@ document.addEventListener('DOMContentLoaded', () => {
   const modeToggle = document.getElementById('modeToggle');
   const heartStars = document.querySelector('.heart-stars');
   const body = document.body;
+  let typewriterAbort = null;
 
   const spawnConfetti = () => {
     if (!glitterLayer) return;
@@ -51,6 +52,13 @@ document.addEventListener('DOMContentLoaded', () => {
   };
 
   const typewriterEffect = async () => {
+    // Cancel any previous typewriter effect
+    if (typewriterAbort) {
+      typewriterAbort.abort();
+    }
+    typewriterAbort = new AbortController();
+    const signal = typewriterAbort.signal;
+
     const letterTexts = document.querySelectorAll('.letter-text');
     const texts = Array.from(letterTexts).map(el => {
       // Save original content if not already saved
@@ -64,13 +72,19 @@ document.addEventListener('DOMContentLoaded', () => {
     letterTexts.forEach(el => el.textContent = '');
     
     // Type each one sequentially
-    for (let idx = 0; idx < texts.length; idx += 1) {
-      const content = texts[idx];
-      const textEl = letterTexts[idx];
-      for (let i = 0; i < content.length; i += 1) {
-        textEl.textContent += content[i];
-        await new Promise(resolve => setTimeout(resolve, 16));
+    try {
+      for (let idx = 0; idx < texts.length; idx += 1) {
+        if (signal.aborted) return;
+        const content = texts[idx];
+        const textEl = letterTexts[idx];
+        for (let i = 0; i < content.length; i += 1) {
+          if (signal.aborted) return;
+          textEl.textContent += content[i];
+          await new Promise(resolve => setTimeout(resolve, 16));
+        }
       }
+    } catch (e) {
+      // Typewriter was cancelled
     }
   };
 
@@ -96,6 +110,10 @@ document.addEventListener('DOMContentLoaded', () => {
         navigator.vibrate(20);
       }
     } else {
+      // Cancel typewriter if running
+      if (typewriterAbort) {
+        typewriterAbort.abort();
+      }
       const letterTexts = document.querySelectorAll('.letter-text');
       for (const textEl of letterTexts) {
         if (textEl.dataset.original) {
