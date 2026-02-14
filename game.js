@@ -78,7 +78,6 @@ document.addEventListener('DOMContentLoaded', () => {
       }
     }
     if (isOpen) {
-      spawnConfetti();
       if (heartStars) {
         heartStars.classList.add('is-on');
         setTimeout(() => heartStars.classList.remove('is-on'), 2000);
