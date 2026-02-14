@@ -51,6 +51,15 @@ document.addEventListener('DOMContentLoaded', () => {
     }
   };
 
+  // Initialize and cache original letter content
+  const letterTexts = document.querySelectorAll('.letter-text');
+  letterTexts.forEach(el => {
+    if (!el.dataset.original) {
+      el.dataset.original = el.innerHTML;
+      el.dataset.originalText = el.textContent;
+    }
+  });
+
   const typewriterEffect = async () => {
     // Cancel any previous typewriter effect
     if (typewriterAbort) {
@@ -60,15 +69,17 @@ document.addEventListener('DOMContentLoaded', () => {
     const signal = typewriterAbort.signal;
 
     const letterTexts = document.querySelectorAll('.letter-text');
-    const texts = Array.from(letterTexts).map(el => {
-      // Save original content if not already saved
-      if (!el.dataset.original) {
-        el.dataset.original = el.innerHTML;
+    
+    // First restore all to original state
+    letterTexts.forEach(el => {
+      if (el.dataset.original) {
+        el.innerHTML = el.dataset.original;
       }
-      return el.textContent;
     });
     
-    // Clear all first
+    const texts = Array.from(letterTexts).map(el => el.dataset.originalText || el.textContent);
+    
+    // Clear all textContent first
     letterTexts.forEach(el => el.textContent = '');
     
     // Type each one sequentially
