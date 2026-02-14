@@ -26,6 +26,13 @@ document.addEventListener('DOMContentLoaded', () => {
     if (!envelope) return;
     const isOpen = envelope.classList.toggle('open');
     envelope.setAttribute('aria-expanded', isOpen ? 'true' : 'false');
+    if (sealButton) {
+      sealButton.setAttribute('aria-label', isOpen ? 'Cerrar la carta' : 'Abrir la carta');
+      const label = sealButton.querySelector('.seal-button__label');
+      if (label) {
+        label.textContent = isOpen ? 'Cierra aqui' : 'Abre aqui';
+      }
+    }
     if (isOpen) {
       if (heartStars) {
         heartStars.classList.add('is-on');

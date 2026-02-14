@@ -328,6 +328,7 @@ h1 {
   box-shadow: 0 24px 42px rgba(46, 14, 34, 0.16);
   border: 1px solid rgba(120, 68, 96, 0.16);
   position: relative;
+  z-index: 1;
   overflow: hidden;
 }
 
@@ -419,6 +420,7 @@ h1 {
   transform-style: preserve-3d;
   backface-visibility: hidden;
   box-shadow: inset 0 -8px 18px rgba(255, 255, 255, 0.35);
+  pointer-events: none;
 }
 
 .envelope.open .envelope__flap {
@@ -427,37 +429,49 @@ h1 {
 
 .seal-button {
   position: absolute;
-  top: 2px;
+  top: 6px;
   left: 50%;
   transform: translateX(-50%);
-  background: radial-gradient(circle, #ff7aa2 0%, #ff3d77 62%);
+  background: linear-gradient(135deg, #ff6f96, #ff3c73);
   color: #fff;
-  width: 50px;
-  height: 50px;
-  border-radius: 50%;
-  display: grid;
-  place-items: center;
+  min-width: 150px;
+  height: 44px;
+  border-radius: 999px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
   font-size: 20px;
-  box-shadow: 0 10px 22px rgba(255, 93, 128, 0.32);
-  z-index: 4;
+  box-shadow: 0 12px 26px rgba(255, 93, 128, 0.4);
+  z-index: 8;
   transition: transform 420ms ease, box-shadow 420ms ease;
   border: none;
   cursor: pointer;
-  padding: 0;
-}
-
-.seal-button::after {
-  content: '';
-  position: absolute;
-  inset: 8px;
-  border-radius: 50%;
-  border: 1px solid rgba(255, 255, 255, 0.5);
-  opacity: 0.6;
+  padding: 0 14px;
+  pointer-events: auto;
 }
 
 .seal-button__icon {
-  font-size: 20px;
+  font-size: 18px;
   line-height: 1;
+}
+
+.seal-button__label {
+  font-size: 11px;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  font-weight: 700;
+  color: rgba(255, 255, 255, 0.98);
+  animation: sealPulse 1.6s ease-in-out infinite;
+}
+
+.envelope.open .seal-button {
+  background: linear-gradient(135deg, #7a3f8f, #5a2f7a);
+}
+
+.envelope.open .seal-button__label {
+  animation: none;
+  letter-spacing: 0.14em;
 }
 
 .envelope.open .seal-button {
@@ -468,6 +482,11 @@ h1 {
 .seal-button:focus-visible {
   outline: 2px solid rgba(255, 255, 255, 0.6);
   outline-offset: 3px;
+}
+
+@keyframes sealPulse {
+  0%, 100% { opacity: 0.7; transform: scale(1); }
+  50% { opacity: 1; transform: scale(1.08); }
 }
 
 .letter-card {
